@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>YEDD Booking</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: split hero with brand left and live booking card right; stacked on phones. */
+:root{
+  --bg:#FBF6F2; --surface:#FFFFFF; --ink:#2A1B3D; --muted:#6E6377;
+  --accent:#F26B4B; --accent-ink:#FFFFFF; --soft:#F3E8E1; --line:#E7DAD2;
+  --display:'Prompt','IBM Plex Sans Thai',system-ui,sans-serif;
+  --body:'IBM Plex Sans Thai','Prompt',system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#17101F; --surface:#221832; --ink:#F6EDE6; --muted:#B3A6BF;
+    --accent:#FF7D5C; --accent-ink:#1B1024; --soft:#2D2140; --line:#3A2D4F; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#17101F; --surface:#221832; --ink:#F6EDE6; --muted:#B3A6BF;
+  --accent:#FF7D5C; --accent-ink:#1B1024; --soft:#2D2140; --line:#3A2D4F; color-scheme:dark;
+}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;line-height:1.15}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+header{display:flex;align-items:center;justify-content:space-between;padding:22px 0}
+.logo{font-family:var(--display);font-weight:700;font-size:26px;letter-spacing:.06em;text-decoration:none;display:flex;align-items:center;gap:10px}
+.logo i{width:14px;height:14px;border-radius:50%;background:var(--accent);display:inline-block}
+nav{display:flex;gap:22px;font-size:15px;color:var(--muted)}
+nav a{text-decoration:none}nav a:hover{color:var(--ink)}
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:48px;align-items:start;padding:28px 0 64px}
+.hero>*{min-width:0}
+html,body{overflow-x:hidden}
+.eyebrow{display:inline-block;background:var(--soft);color:var(--ink);padding:6px 14px;border-radius:999px;font-size:14px;font-weight:500}
+.hero h1{font-size:clamp(40px,6vw,68px);font-weight:700;margin:20px 0 16px;letter-spacing:-.01em}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.lead{color:var(--muted);font-size:18px;max-width:46ch}
+.facts{display:flex;gap:28px;margin-top:32px;flex-wrap:wrap}
+.facts div{display:flex;flex-direction:column}
+.facts b{font-family:var(--display);font-size:28px;font-variant-numeric:tabular-nums}
+.facts span{color:var(--muted);font-size:14px}
+.blob{margin-top:36px;height:170px;border-radius:28px;background:
+  radial-gradient(circle at 20% 30%,var(--accent) 0 28%,transparent 29%),
+  radial-gradient(circle at 62% 70%,var(--ink) 0 22%,transparent 23%),
+  radial-gradient(circle at 86% 28%,var(--soft) 0 24%,transparent 25%),var(--surface);
+  border:1px solid var(--line)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:28px;padding:28px;box-shadow:0 24px 60px -30px rgba(42,27,61,.35)}
+.card h2{font-size:24px;margin-bottom:4px}
+.card>p{color:var(--muted);font-size:15px;margin-bottom:20px}
+.step{font-size:13px;font-weight:600;letter-spacing:.04em;color:var(--muted);margin:20px 0 10px;text-transform:uppercase}
+.services{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.opt{border:1.5px solid var(--line);background:var(--bg);border-radius:16px;padding:14px;cursor:pointer;text-align:left;font:inherit;color:inherit;transition:.15s}
+.opt:hover{border-color:var(--accent)}
+.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.opt b{display:block;font-family:var(--display);font-size:16px}
+.opt small{color:var(--muted);font-size:13px;display:block}
+.opt .p{margin-top:8px;font-weight:600;font-variant-numeric:tabular-nums}
+.days{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x mandatory}
+.day{flex:0 0 64px;scroll-snap-align:start;min-width:0;border:1.5px solid var(--line);background:var(--bg);border-radius:16px;padding:10px 0;text-align:center;cursor:pointer;font:inherit;color:inherit}
+.day span{display:block;font-size:12px;color:var(--muted)}
+.day b{font-family:var(--display);font-size:20px;font-variant-numeric:tabular-nums}
+.day[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.day[aria-pressed="true"] span{color:inherit;opacity:.8}
+.times{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.time{border:1.5px solid var(--line);background:var(--bg);border-radius:12px;padding:9px 0;font:inherit;font-variant-numeric:tabular-nums;cursor:pointer;color:inherit}
+.time:hover:not(:disabled){border-color:var(--accent)}
+.time[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.time:disabled{opacity:.4;text-decoration:line-through;cursor:not-allowed}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label{font-size:14px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+input{font:inherit;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:11px 13px}
+input:focus{outline:none;border-color:var(--accent)}
+.summary{margin-top:20px;background:var(--soft);border-radius:16px;padding:14px 16px;display:flex;justify-content:space-between;gap:12px;font-size:15px;align-items:center}
+.summary b{font-family:var(--display);font-size:20px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.go{margin-top:14px;width:100%;border:0;border-radius:16px;background:var(--accent);color:var(--accent-ink);font:600 17px var(--display);padding:16px;cursor:pointer;transition:.15s}
+.go:hover{filter:brightness(1.06);transform:translateY(-1px)}
+.err{color:#C2331A;font-size:14px;min-height:20px;margin-top:8px}
+:root[data-theme="dark"] .err{color:#FF9A85}
+.done{text-align:center;padding:26px 6px}
+.done .tick{width:64px;height:64px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;margin:0 auto 16px;font-size:32px}
+.done h2{font-size:26px;margin-bottom:8px}
+.done p{color:var(--muted)}
+.ref{display:inline-block;margin:16px 0;background:var(--soft);padding:8px 18px;border-radius:999px;font-family:var(--display);letter-spacing:.1em;font-weight:600}
+.ghost{background:none;border:1.5px solid var(--line);color:var(--ink);border-radius:14px;padding:11px 20px;font:inherit;cursor:pointer}
+section.block{padding:56px 0;border-top:1px solid var(--line)}
+section.block h2{font-size:clamp(28px,4vw,38px);margin-bottom:28px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:24px}
+.tile h3{font-size:19px;margin-bottom:8px}
+.tile p{color:var(--muted);font-size:15px}
+.tile .n{font-family:var(--display);color:var(--accent);font-weight:700;font-size:15px;margin-bottom:10px}
+footer{padding:36px 0 56px;color:var(--muted);font-size:14px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line)}
+@media (max-width:1000px){
+  .hero{grid-template-columns:minmax(0,1fr);gap:32px}
+  .grid3{grid-template-columns:1fr}
+  nav{display:none}
+}
+@media (max-width:480px){
+  .services{grid-template-columns:1fr}
+  .times{grid-template-columns:repeat(3,1fr)}
+  .fields{grid-template-columns:1fr}
+  .card{padding:20px;border-radius:22px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="logo" href="#top"><i></i>YEDD</a>
+    <nav><a href="#how">ขั้นตอนจอง</a><a href="#why">ทำไมต้อง YEDD</a><a href="#contact">ติดต่อ</a></nav>
+  </header>
+
+  <main id="top">
+    <div class="hero">
+      <div>
+        <span class="eyebrow">เปิดจองออนไลน์ 24 ชั่วโมง</span>
+        <h1>จองคิวง่ายๆ <em>ในไม่กี่คลิก</em></h1>
+        <p class="lead">เลือกบริการ เลือกวัน เลือกเวลา แล้วรับรหัสยืนยันทันที ไม่ต้องรอแชต ไม่ต้องโทรนัด</p>
+        <div class="facts">
+          <div><b>10:00–19:00</b><span>เปิดทุกวัน</span></div>
+          <div><b>30 วินาที</b><span>ใช้เวลาจองโดยเฉลี่ย</span></div>
+          <div><b>ฟรี</b><span>เลื่อนนัดได้ล่วงหน้า 24 ชม.</span></div>
+        </div>
+        <div class="blob" role="img" aria-label="ภาพประกอบแบบนามธรรม"></div>
+      </div>
+
+      <div class="card" id="book">
+        <div id="form">
+          <h2>จองคิวของคุณ</h2>
+          <p>กรอกข้อมูลสี่ขั้นตอน แล้วรับรหัสการจองทันที</p>
+
+          <div class="step">1 · เลือกบริการ</div>
+          <div class="services" id="services"></div>
+
+          <div class="step">2 · เลือกวัน</div>
+          <div class="days" id="days"></div>
+
+          <div class="step">3 · เลือกเวลา</div>
+          <div class="times" id="times"></div>
+
+          <div class="step">4 · ข้อมูลติดต่อ</div>
+          <div class="fields">
+            <label for="name">ชื่อ<input id="name" autocomplete="name" placeholder="ชื่อเล่นหรือชื่อจริง"></label>
+            <label for="phone">เบอร์โทร<input id="phone" inputmode="tel" autocomplete="tel" placeholder="08x-xxx-xxxx"></label>
+          </div>
+
+          <div class="summary"><span id="sumText">ยังไม่ได้เลือกบริการ</span><b id="sumPrice">฿0</b></div>
+          <div class="err" id="err" role="alert"></div>
+          <button class="go" id="go" type="button">ยืนยันการจอง</button>
+        </div>
+
+        <div class="done" id="done" hidden>
+          <div class="tick" aria-hidden="true">✓</div>
+          <h2>จองสำเร็จ</h2>
+          <p id="doneText"></p>
+          <div class="ref" id="ref"></div>
+          <p>เก็บรหัสนี้ไว้แสดงเมื่อมาถึง</p><br>
+          <button class="ghost" id="again" type="button">จองคิวใหม่</button>
+        </div>
+      </div>
+    </div>
+
+    <section class="block" id="how">
+      <h2>จองได้ใน 3 ขั้นตอน</h2>
+      <div class="grid3">
+        <div class="tile"><div class="n">01</div><h3>เลือกบริการและเวลา</h3><p>ดูช่วงเวลาว่างได้ทันที ช่วงที่ถูกจองแล้วจะขีดฆ่าไว้</p></div>
+        <div class="tile"><div class="n">02</div><h3>กรอกชื่อและเบอร์โทร</h3><p>ใช้ข้อมูลแค่สองอย่าง ไม่ต้องสมัครสมาชิก</p></div>
+        <div class="tile"><div class="n">03</div><h3>รับรหัสยืนยัน</h3><p>แสดงรหัสการจองเมื่อมาถึง แล้วใช้บริการได้เลย</p></div>
+      </div>
+    </section>
+
+    <section class="block" id="why">
+      <h2>ทำไมต้อง YEDD</h2>
+      <div class="grid3">
+        <div class="tile"><h3>ตรงเวลา</h3><p>เราเริ่มตามนัดทุกคิว เพราะจำกัดจำนวนคิวต่อวัน</p></div>
+        <div class="tile"><h3>ราคาชัดเจน</h3><p>ราคาที่เห็นตอนจองคือราคาที่จ่ายจริง ไม่มีค่าใช้จ่ายแอบแฝง</p></div>
+        <div class="tile"><h3>เลื่อนนัดได้</h3><p>แจ้งล่วงหน้า 24 ชั่วโมง เลื่อนได้ฟรี</p></div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="contact">
+    <span>© 2026 YEDD</span>
+    <span>ติดต่อ: 08x-xxx-xxxx · hello@yedd.example</span>
+  </footer>
+</div>
+
+<script>
+const SERVICES=[
+  {id:'s1',name:'Express',desc:'30 นาที',price:490},
+  {id:'s2',name:'Standard',desc:'60 นาที',price:890},
+  {id:'s3',name:'Premium',desc:'90 นาที',price:1290}
+];
+const HOURS=['10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00'];
+const state={service:null,day:null,time:null};
+const $=id=>document.getElementById(id);
+const fmt=n=>'฿'+n.toLocaleString('en-US');
+
+function buildServices(){
+  $('services').innerHTML='';
+  SERVICES.forEach(s=>{
+    const b=document.createElement('button');
+    b.type='button';b.className='opt';b.setAttribute('aria-pressed','false');
+    b.innerHTML=`<b>${s.name}</b><small>${s.desc}</small><div class="p">${fmt(s.price)}</div>`;
+    b.onclick=()=>{state.service=s;[...$('services').children].forEach(c=>c.setAttribute('aria-pressed',c===b));update()};
+    $('services').appendChild(b);
+  });
+}
+function buildDays(){
+  $('days').innerHTML='';
+  const names=['อา','จ','อ','พ','พฤ','ศ','ส'];
+  const start=new Date();
+  for(let i=0;i<14;i++){
+    const d=new Date(start.getFullYear(),start.getMonth(),start.getDate()+i);
+    const b=document.createElement('button');
+    b.type='button';b.className='day';b.setAttribute('aria-pressed','false');
+    b.innerHTML=`<span>${names[d.getDay()]}</span><b>${d.getDate()}</b><span>${d.toLocaleDateString('th-TH',{month:'short'})}</span>`;
+    b.onclick=()=>{state.day=d;state.time=null;[...$('days').children].forEach(c=>c.setAttribute('aria-pressed',c===b));buildTimes();update()};
+    $('days').appendChild(b);
+  }
+}
+function taken(d,h){ // sample availability: some slots look booked
+  const k=d.getDate()*7+parseInt(h)*3+d.getMonth();
+  return k%5===0||k%7===3;
+}
+function buildTimes(){
+  $('times').innerHTML='';
+  HOURS.forEach(h=>{
+    const b=document.createElement('button');
+    b.type='button';b.className='time';b.textContent=h;b.setAttribute('aria-pressed','false');
+    if(!state.day||taken(state.day,h))b.disabled=true;
+    b.onclick=()=>{state.time=h;[...$('times').children].forEach(c=>c.setAttribute('aria-pressed',c===b));update()};
+    $('times').appendChild(b);
+  });
+}
+function dateText(){return state.day.toLocaleDateString('th-TH',{weekday:'long',day:'numeric',month:'long'})}
+function update(){
+  const s=state.service;
+  let t=s?`${s.name} · ${s.desc}`:'ยังไม่ได้เลือกบริการ';
+  if(state.day)t+=` · ${state.day.getDate()} ${state.day.toLocaleDateString('th-TH',{month:'short'})}`;
+  if(state.time)t+=` · ${state.time}`;
+  $('sumText').textContent=t;
+  $('sumPrice').textContent=fmt(s?s.price:0);
+  $('err').textContent='';
+}
+$('go').onclick=()=>{
+  const name=$('name').value.trim(),phone=$('phone').value.replace(/\D/g,'');
+  let m='';
+  if(!state.service)m='กรุณาเลือกบริการ';
+  else if(!state.day)m='กรุณาเลือกวัน';
+  else if(!state.time)m='กรุณาเลือกเวลา';
+  else if(!name)m='กรุณากรอกชื่อ';
+  else if(phone.length<9)m='กรุณากรอกเบอร์โทรให้ครบ อย่างน้อย 9 หลัก';
+  if(m){$('err').textContent=m;return}
+  const code='YD-'+Math.random().toString(36).slice(2,6).toUpperCase()+Math.floor(Math.random()*90+10);
+  $('doneText').textContent=`คุณ${name} จอง ${state.service.name} วัน${dateText()} เวลา ${state.time} น. ยอด ${fmt(state.service.price)}`;
+  $('ref').textContent=code;
+  $('form').hidden=true;$('done').hidden=false;
+  $('book').scrollIntoView({behavior:'smooth',block:'start'});
+};
+$('again').onclick=()=>{
+  state.service=state.day=state.time=null;
+  $('name').value='';$('phone').value='';
+  buildServices();buildDays();buildTimes();update();
+  $('done').hidden=true;$('form').hidden=false;
+};
+buildServices();buildDays();buildTimes();update();
+</script>
+</body>
+</html>
